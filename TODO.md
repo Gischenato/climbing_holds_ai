@@ -73,10 +73,26 @@
 - [ ] Script de avaliação: precision, recall e IoU médio
 - [ ] Anotar os principais erros (parafusos? volumes? sombras? agarras pequenas?)
 
+## Fase 4.1 — Converter dataset de caixas em polígonos (SAM)
+
+> Necessária se o dataset público da Fase 5 tiver só **retângulos** (projeto "Object Detection" no Roboflow / linhas `classe x y w h` no `.txt`). Treinar YOLO-seg com caixas ensina o modelo a prever retângulos.
+
+- [ ] Baixar o dataset de caixas no formato YOLO para `data/`
+- [ ] Limpar classes: remover o que não é agarra (ex.: números de via) e decidir sobre volumes — 📖 [regras de anotação](docs/05-datasets-e-anotacao.md#anotação)
+- [ ] Script `backend/boxes_to_polygons.py`:
+  - [ ] Ler cada `.txt` e converter as caixas de normalizado (0–1) para pixels
+  - [ ] Passar cada caixa como **prompt de caixa** para o SAM — 📖 [tipos de prompt](docs/03-segment-anything-sam.md#tipos-de-prompt)
+  - [ ] Converter a máscara em polígono (reusar `mask_to_polygon` da Fase 1) — 📖 [máscara → polígono](docs/07-mascaras-e-pos-processamento.md#de-máscara-para-polígono)
+  - [ ] Normalizar de volta para 0–1 e gravar no formato **YOLO segmentation** em um novo diretório (não sobrescrever o original) — 📖 [formato](docs/05-datasets-e-anotacao.md#formatos-comuns)
+  - [ ] Salvar imagens de debug com os polígonos desenhados
+- [ ] Revisar uma amostra, com atenção a agarras sobre volumes e agarras vizinhas grudadas
+- [ ] Lembrar: agarras sem caixa no dataset original continuam sem anotação
+
 ## Fase 5 — YOLO-seg treinado para agarras
 
 - [ ] Estudar: 📖 [Redes neurais e transfer learning](docs/02-redes-neurais-e-cnns.md), 📖 [YOLO](docs/04-yolo-segmentacao.md), 📖 [Datasets](docs/05-datasets-e-anotacao.md)
 - [ ] Buscar dataset público de agarras com máscaras (ex.: Roboflow Universe, busca "climbing holds") e conferir a licença
+  - [ ] Se as anotações forem só caixas → fazer a [Fase 4.1](#fase-41--converter-dataset-de-caixas-em-polígonos-sam) antes de treinar
 - [ ] Exportar no formato **YOLO segmentation** e checar o `data.yaml`
 - [ ] Conferir split train / val / test
 - [ ] Fine-tuning do `yolo11n-seg.pt` (começar pequeno, depois testar `s`/`m`)
