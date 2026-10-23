@@ -29,6 +29,7 @@
 - [ ] Estudar: 📖 [Visão computacional](docs/01-visao-computacional.md) e 📖 [Segment Anything](docs/03-segment-anything-sam.md)
 - [ ] Escolher a versão do SAM (SAM 2 ou SAM 3 — o SAM 3 aceita prompt de texto como `"climbing hold"`; conferir a versão mais recente)
 - [ ] Baixar o checkpoint para `models/`
+- [ ] Separar algumas fotos para testar (não precisa de anotação): imagens de `data/train/images/` servem para começar, mas fotos próprias em resolução cheia são melhores (as do dataset têm só 640 px)
 - [ ] Script `backend/try_sam.py`: carregar uma foto de parede e gerar todas as máscaras automaticamente
 - [ ] Salvar uma imagem com as máscaras sobrepostas para inspecionar o resultado
 - [ ] Ajustar parâmetros do gerador (`points_per_side`, `pred_iou_thresh`, `stability_score_thresh`) — 📖 [parâmetros](docs/03-segment-anything-sam.md#parâmetros-do-automatic-mask-generator)
@@ -68,33 +69,36 @@
 ## Fase 4 — Avaliação do SAM
 
 - [ ] Estudar: 📖 [Métricas](docs/06-metricas.md)
-- [ ] Juntar ~20 fotos de paredes variadas (ângulos, iluminação, cores) em `data/test/`
+- [ ] Juntar ~20 fotos **próprias** de paredes variadas (ângulos, iluminação, cores) em `data/test/` — nenhuma pode estar nos datasets de treino
 - [ ] Anotar manualmente as agarras de algumas fotos — 📖 [Anotação](docs/05-datasets-e-anotacao.md)
 - [ ] Script de avaliação: precision, recall e IoU médio
 - [ ] Anotar os principais erros (parafusos? volumes? sombras? agarras pequenas?)
 
-## Fase 4.1 — Converter dataset de caixas em polígonos (SAM)
+## Fase 4.1 — Preparar o dataset de treino (juntar datasets + caixas → polígonos)
 
-> Necessária se o dataset público da Fase 5 tiver só **retângulos** (projeto "Object Detection" no Roboflow / linhas `classe x y w h` no `.txt`). Treinar YOLO-seg com caixas ensina o modelo a prever retângulos.
+> Os datasets públicos vêm em formatos diferentes: só **caixas** (linhas `classe x y w h`), só polígonos, ou misturados (o atual tem 8.756 caixas e 7.733 polígonos). Também vêm com classes diferentes (o atual tem 12: cores + `volume`). Treinar YOLO-seg com caixas ensina o modelo a prever retângulos.
 
-- [ ] Baixar o dataset de caixas no formato YOLO para `data/`
-- [ ] Limpar classes: remover o que não é agarra (ex.: números de via) e decidir sobre volumes — 📖 [regras de anotação](docs/05-datasets-e-anotacao.md#anotação)
-- [ ] Script `backend/boxes_to_polygons.py`:
-  - [ ] Ler cada `.txt` e converter as caixas de normalizado (0–1) para pixels
-  - [ ] Passar cada caixa como **prompt de caixa** para o SAM — 📖 [tipos de prompt](docs/03-segment-anything-sam.md#tipos-de-prompt)
+- [ ] Juntar os datasets originais em `data/` (sem modificar) e conferir a licença de cada um
+- [ ] Comparar o critério de anotação entre eles (volume conta? números de via? contorno justo?) — 📖 [regras de anotação](docs/05-datasets-e-anotacao.md#anotação)
+- [ ] Definir as classes finais: `hold` + `volume` (ou só `hold`); as cores ficam no original para o backlog
+- [ ] Script `backend/prepare_dataset.py` (lê um ou mais datasets → gera `data/holds/`):
+  - [ ] Remapear as classes de cada dataset para as classes finais (descartar o que não é agarra)
+  - [ ] Linhas com **caixa**: converter para pixels e passar como **prompt de caixa** para o SAM — 📖 [tipos de prompt](docs/03-segment-anything-sam.md#tipos-de-prompt)
   - [ ] Converter a máscara em polígono (reusar `mask_to_polygon` da Fase 1) — 📖 [máscara → polígono](docs/07-mascaras-e-pos-processamento.md#de-máscara-para-polígono)
-  - [ ] Normalizar de volta para 0–1 e gravar no formato **YOLO segmentation** em um novo diretório (não sobrescrever o original) — 📖 [formato](docs/05-datasets-e-anotacao.md#formatos-comuns)
-  - [ ] Salvar imagens de debug com os polígonos desenhados
+  - [ ] Linhas que já são **polígono**: manter
+  - [ ] Normalizar para 0–1 e gravar no formato **YOLO segmentation** — 📖 [formato](docs/05-datasets-e-anotacao.md#formatos-comuns)
+  - [ ] Remover imagens duplicadas entre datasets (forks no Roboflow são comuns) — por hash
+  - [ ] Criar o split train / val (~85/15); o test são as fotos próprias da Fase 4
+  - [ ] Gerar um `data.yaml` novo com caminhos e classes corretos
+  - [ ] Salvar imagens de debug com os polígonos desenhados (gerados pelo SAM em outra cor)
 - [ ] Revisar uma amostra, com atenção a agarras sobre volumes e agarras vizinhas grudadas
-- [ ] Lembrar: agarras sem caixa no dataset original continuam sem anotação
+- [ ] Lembrar: agarras sem anotação no dataset original continuam sem anotação
 
 ## Fase 5 — YOLO-seg treinado para agarras
 
 - [ ] Estudar: 📖 [Redes neurais e transfer learning](docs/02-redes-neurais-e-cnns.md), 📖 [YOLO](docs/04-yolo-segmentacao.md), 📖 [Datasets](docs/05-datasets-e-anotacao.md)
-- [ ] Buscar dataset público de agarras com máscaras (ex.: Roboflow Universe, busca "climbing holds") e conferir a licença
-  - [ ] Se as anotações forem só caixas → fazer a [Fase 4.1](#fase-41--converter-dataset-de-caixas-em-polígonos-sam) antes de treinar
-- [ ] Exportar no formato **YOLO segmentation** e checar o `data.yaml`
-- [ ] Conferir split train / val / test
+- [ ] Buscar mais datasets públicos de agarras (Roboflow Universe, busca "climbing holds"), exportar em **YOLOv11** e passar pela [Fase 4.1](#fase-41--preparar-o-dataset-de-treino-juntar-datasets--caixas--polígonos)
+- [ ] Conferir o `data/holds/data.yaml` gerado e o split train / val
 - [ ] Fine-tuning do `yolo11n-seg.pt` (começar pequeno, depois testar `s`/`m`)
 - [ ] Analisar as curvas de treino (loss, mAP) e checar overfitting
 - [ ] Avaliar no **mesmo** conjunto de teste da Fase 4 e comparar com o SAM
