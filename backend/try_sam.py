@@ -18,15 +18,17 @@ CHECKPOINT = "models/sam2.1_hiera_large.pt"
 CONFIG = "configs/sam2.1/sam2.1_hiera_l.yaml"
 
 
-def build_generator() -> SAM2AutomaticMaskGenerator:
+GENERATOR_DEFAULTS = dict(
+    points_per_side=64,
+    pred_iou_thresh=0.7,
+    stability_score_thresh=0.85,
+    min_mask_region_area=50,
+)
+
+
+def build_generator(**overrides) -> SAM2AutomaticMaskGenerator:
     model = build_sam2(CONFIG, CHECKPOINT, device="cuda", apply_postprocessing=False)
-    return SAM2AutomaticMaskGenerator(
-        model,
-        points_per_side=32,
-        pred_iou_thresh=0.8,
-        stability_score_thresh=0.9,
-        min_mask_region_area=50,
-    )
+    return SAM2AutomaticMaskGenerator(model, **{**GENERATOR_DEFAULTS, **overrides})
 
 
 def draw_debug(img_rgb: np.ndarray, kept: list[dict], dropped: list[tuple[dict, str]]) -> np.ndarray:

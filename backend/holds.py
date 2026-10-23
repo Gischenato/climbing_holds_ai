@@ -30,11 +30,11 @@ def _iou(a: np.ndarray, b: np.ndarray) -> float:
 def filter_masks(
     masks: list[dict],
     image_shape: tuple[int, int],
-    min_area_frac: float = 0.0002,
+    min_area_frac: float = 0.0001,
     max_area_frac: float = 0.05,
     max_aspect: float = 6.0,
     border_margin: int = 2,
-    dup_iou: float = 0.7,
+    dup_iou: float = 0.5,
 ) -> tuple[list[dict], list[tuple[dict, str]]]:
     """Devolve (mantidas, [(descartada, motivo)])."""
     h, w = image_shape

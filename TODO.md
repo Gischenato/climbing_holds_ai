@@ -33,6 +33,7 @@
 - [x] Script `backend/try_sam.py`: carregar uma foto de parede e gerar todas as máscaras automaticamente
 - [x] Salvar uma imagem com as máscaras sobrepostas para inspecionar o resultado
 - [x] Ajustar parâmetros do gerador (`points_per_side`, `pred_iou_thresh`, `stability_score_thresh`) — 📖 [parâmetros](docs/03-segment-anything-sam.md#parâmetros-do-automatic-mask-generator)
+  - Medido contra as anotações do dataset (24 fotos, 2318 agarras): `points_per_side=64`, `pred_iou_thresh=0.7`, `stability_score_thresh=0.85` → recall 58% → 80%, F1 0,65 → 0,73 (~7,7 s/foto na GPU). Ampliar a imagem 2x não ajudou.
 - [x] Filtrar máscaras que não são agarras — 📖 [Pós-processamento](docs/07-mascaras-e-pos-processamento.md#filtragem)
   - [x] Área mínima / máxima (remove ruído e a parede inteira)
   - [x] Remover máscaras muito sobrepostas (ficar com a de melhor score)
