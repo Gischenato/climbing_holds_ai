@@ -27,17 +27,17 @@
 ## Fase 1 — Detecção com SAM (sem treino)
 
 - [ ] Estudar: 📖 [Visão computacional](docs/01-visao-computacional.md) e 📖 [Segment Anything](docs/03-segment-anything-sam.md)
-- [ ] Escolher a versão do SAM (SAM 2 ou SAM 3 — o SAM 3 aceita prompt de texto como `"climbing hold"`; conferir a versão mais recente)
-- [ ] Baixar o checkpoint para `models/`
-- [ ] Separar algumas fotos para testar (não precisa de anotação): imagens de `data/train/images/` servem para começar, mas fotos próprias em resolução cheia são melhores (as do dataset têm só 640 px)
-- [ ] Script `backend/try_sam.py`: carregar uma foto de parede e gerar todas as máscaras automaticamente
-- [ ] Salvar uma imagem com as máscaras sobrepostas para inspecionar o resultado
-- [ ] Ajustar parâmetros do gerador (`points_per_side`, `pred_iou_thresh`, `stability_score_thresh`) — 📖 [parâmetros](docs/03-segment-anything-sam.md#parâmetros-do-automatic-mask-generator)
-- [ ] Filtrar máscaras que não são agarras — 📖 [Pós-processamento](docs/07-mascaras-e-pos-processamento.md#filtragem)
-  - [ ] Área mínima / máxima (remove ruído e a parede inteira)
-  - [ ] Remover máscaras muito sobrepostas (ficar com a de melhor score)
-  - [ ] Remover máscaras que tocam a borda da imagem e são enormes (fundo)
-- [ ] Converter cada máscara em **polígono** (OpenCV `findContours` + `approxPolyDP`) — 📖 [máscara → polígono](docs/07-mascaras-e-pos-processamento.md#de-máscara-para-polígono)
+- [x] Escolher a versão do SAM (**SAM 2.1 escolhido**: o SAM 3, que aceita prompt de texto como `"climbing hold"`, tem checkpoint restrito no HuggingFace — exige solicitar acesso; fica como opção futura)
+- [x] Baixar o checkpoint para `models/`
+- [x] Separar algumas fotos para testar (não precisa de anotação): imagens de `data/train/images/` servem para começar, mas fotos próprias em resolução cheia são melhores (as do dataset têm só 640 px)
+- [x] Script `backend/try_sam.py`: carregar uma foto de parede e gerar todas as máscaras automaticamente
+- [x] Salvar uma imagem com as máscaras sobrepostas para inspecionar o resultado
+- [x] Ajustar parâmetros do gerador (`points_per_side`, `pred_iou_thresh`, `stability_score_thresh`) — 📖 [parâmetros](docs/03-segment-anything-sam.md#parâmetros-do-automatic-mask-generator)
+- [x] Filtrar máscaras que não são agarras — 📖 [Pós-processamento](docs/07-mascaras-e-pos-processamento.md#filtragem)
+  - [x] Área mínima / máxima (remove ruído e a parede inteira)
+  - [x] Remover máscaras muito sobrepostas (ficar com a de melhor score)
+  - [x] Remover máscaras que tocam a borda da imagem e são enormes (fundo)
+- [x] Converter cada máscara em **polígono** (OpenCV `findContours` + `approxPolyDP`) — 📖 [máscara → polígono](docs/07-mascaras-e-pos-processamento.md#de-máscara-para-polígono)
 
 ## Fase 2 — Backend (FastAPI)
 
