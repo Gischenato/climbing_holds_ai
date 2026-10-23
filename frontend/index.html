@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Detector de agarras</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <h1>Detector de agarras</h1>
+    <p class="subtitle">Envie a foto de uma parede, a IA encontra as agarras e você clica para selecionar.</p>
+  </header>
+
+  <main>
+    <section class="toolbar" aria-label="Controles">
+      <label class="file-button">
+        <input type="file" id="file" accept="image/*">
+        <span>Escolher foto</span>
+      </label>
+      <button id="detect" disabled>Detectar agarras</button>
+      <span class="spacer"></span>
+      <button id="zoom-reset" class="secondary" disabled title="Voltar ao tamanho que cabe na tela">Zoom 100%</button>
+      <button id="select-all" class="secondary" disabled>Selecionar tudo</button>
+      <button id="clear" class="secondary" disabled>Limpar seleção</button>
+      <output id="counter" aria-live="polite">Nenhuma agarra detectada</output>
+    </section>
+
+    <p id="status" role="status" hidden></p>
+
+    <section class="stage" id="stage">
+      <p class="placeholder" id="placeholder">Escolha uma foto para começar<br><small>ou arraste uma imagem para cá</small></p>
+      <div class="viewport" id="viewport" hidden><canvas id="canvas"></canvas></div>
+      <div class="loading" id="loading" hidden>
+        <div class="spinner"></div>
+        <p>Detectando agarras… leva alguns segundos</p>
+      </div>
+    </section>
+  </main>
+
+  <script type="module" src="app.js"></script>
+</body>
+</html>

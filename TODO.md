@@ -57,15 +57,15 @@
 
 ## Fase 3 — Frontend (selecionar/deselecionar)
 
-- [ ] Input de upload de imagem + botão "Detectar"
-- [ ] Exibir a imagem em um `<canvas>` ajustado à tela
-- [ ] Desenhar os polígonos das agarras por cima (contorno leve)
-- [ ] Converter coordenadas tela ↔ imagem — 📖 [coordenadas](docs/08-arquitetura-da-aplicacao.md#coordenadas-imagem--tela)
-- [ ] Clique → descobrir qual polígono contém o ponto (**hit-test**) — 📖 [ponto-em-polígono](docs/07-mascaras-e-pos-processamento.md#ponto-em-polígono-hit-testing)
-- [ ] Alternar seleção da agarra clicada (preenchimento destacado quando selecionada)
-- [ ] Se o clique cair em várias agarras sobrepostas, escolher a de **menor área**
-- [ ] Botões "Limpar seleção" e "Selecionar tudo" + contador de selecionadas
-- [ ] Indicador de "carregando" enquanto o backend processa
+- [x] Input de upload de imagem + botão "Detectar"
+- [x] Exibir a imagem em um `<canvas>` ajustado à tela
+- [x] Desenhar os polígonos das agarras por cima (contorno leve)
+- [x] Converter coordenadas tela ↔ imagem — 📖 [coordenadas](docs/08-arquitetura-da-aplicacao.md#coordenadas-imagem--tela)
+- [x] Clique → descobrir qual polígono contém o ponto (**hit-test**) — 📖 [ponto-em-polígono](docs/07-mascaras-e-pos-processamento.md#ponto-em-polígono-hit-testing)
+- [x] Alternar seleção da agarra clicada (preenchimento destacado quando selecionada)
+- [x] Se o clique cair em várias agarras sobrepostas, escolher a de **menor área**
+- [x] Botões "Limpar seleção" e "Selecionar tudo" + contador de selecionadas
+- [x] Indicador de "carregando" enquanto o backend processa
 
 ## Fase 4 — Avaliação do SAM
 

@@ -17,7 +17,7 @@ O modelo (SAM 2.1, ~900 MB) é carregado na subida; o servidor só atende depois
 
 | URL | O que é |
 |---|---|
-| `http://localhost:8000/` | O frontend (pasta `frontend/`). Enquanto ela estiver vazia, devolve `{"detail":"Not Found"}` |
+| `http://localhost:8000/` | O frontend (pasta `frontend/`): página para enviar a foto e selecionar as agarras. Se a pasta não existir ou estiver sem `index.html`, devolve `{"detail":"Not Found"}` |
 | `http://localhost:8000/docs` | Swagger: testa a API pelo navegador |
 | `http://localhost:8000/openapi.json` | Descrição da API em formato OpenAPI |
 
@@ -129,3 +129,4 @@ A API depende só da interface `Detector` ([detectors.py](../backend/detectors.p
 | Data | Mudança |
 |---|---|
 | 2026-10-22 | Criação: `POST /detect` com SAM 2.1; frontend servido em `/` |
+| 2026-10-22 | Frontend (Fase 3) adicionado em `frontend/`; a API não mudou |
