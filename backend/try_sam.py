@@ -1,7 +1,7 @@
 """Experimento da Fase 1: gera máscaras automáticas do SAM 2 e salva uma imagem de debug.
 
 Uso:
-    python backend/try_sam.py data/train/images/foto.jpg [--out data/out]
+    python -m backend.try_sam data/train/images/foto.jpg [--out data/out]
 """
 import argparse
 from pathlib import Path
@@ -12,7 +12,7 @@ import torch
 from sam2.automatic_mask_generator import SAM2AutomaticMaskGenerator
 from sam2.build_sam import build_sam2
 
-from holds import filter_masks, to_holds
+from backend.holds import filter_masks, to_holds
 
 CHECKPOINT = "models/sam2.1_hiera_large.pt"
 CONFIG = "configs/sam2.1/sam2.1_hiera_l.yaml"

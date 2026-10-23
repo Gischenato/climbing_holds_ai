@@ -43,17 +43,17 @@
 ## Fase 2 — Backend (FastAPI)
 
 - [ ] Estudar: 📖 [Arquitetura da aplicação](docs/08-arquitetura-da-aplicacao.md)
-- [ ] Criar interface abstrata `Detector` com `detect(image) -> list[Hold]` (para trocar SAM ↔ YOLO depois sem mexer na API)
-- [ ] Implementar `SamDetector` com o código da Fase 1
-- [ ] Carregar o modelo **uma única vez** no startup (lifespan do FastAPI) — 📖 [por quê](docs/08-arquitetura-da-aplicacao.md#carregar-o-modelo-uma-vez)
-- [ ] Endpoint `POST /detect` recebendo a imagem (multipart/form-data)
-- [ ] Resposta JSON:
+- [x] Criar interface abstrata `Detector` com `detect(image) -> list[Hold]` (para trocar SAM ↔ YOLO depois sem mexer na API)
+- [x] Implementar `SamDetector` com o código da Fase 1
+- [x] Carregar o modelo **uma única vez** no startup (lifespan do FastAPI) — 📖 [por quê](docs/08-arquitetura-da-aplicacao.md#carregar-o-modelo-uma-vez)
+- [x] Endpoint `POST /detect` recebendo a imagem (multipart/form-data)
+- [x] Resposta JSON:
   ```json
   { "width": 4000, "height": 3000,
     "holds": [ { "id": 0, "polygon": [[x, y], ...], "bbox": [x, y, w, h], "score": 0.93 } ] }
   ```
-- [ ] Servir o `frontend/` como arquivos estáticos pelo próprio FastAPI
-- [ ] Testar com `curl` / Swagger em `http://localhost:8000/docs`
+- [x] Servir o `frontend/` como arquivos estáticos pelo próprio FastAPI
+- [x] Testar com `curl` / Swagger em `http://localhost:8000/docs`
 
 ## Fase 3 — Frontend (selecionar/deselecionar)
 

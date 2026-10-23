@@ -1,7 +1,7 @@
 """Mede recall/precision do SAM + filtros contra as anotações do dataset (por IoU de caixa).
 
 Gera as máscaras uma vez e testa várias combinações de parâmetros dos filtros.
-Uso: python backend/tune_filters.py [--n 24]
+Uso: python -m backend.tune_filters [--n 24]
 """
 import argparse
 import itertools
@@ -10,8 +10,8 @@ from pathlib import Path
 import cv2
 import torch
 
-from holds import filter_masks
-from try_sam import build_generator
+from backend.holds import filter_masks
+from backend.try_sam import build_generator
 
 IMAGES = Path("data/train/images")
 LABELS = Path("data/train/labels")

@@ -24,6 +24,8 @@ Ordem sugerida, ligada às fases do [TODO](../TODO.md):
 | 7 | [Datasets e anotação](05-datasets-e-anotacao.md) | Fases 4 e 5 |
 | 8 | [YOLO e segmentação](04-yolo-segmentacao.md) | Fase 5 |
 
+Referência do que o backend expõe (endpoints, campos, erros): [Referência da API](api.md).
+
 Dúvida rápida sobre um termo? Veja o [glossário](glossario.md).
 
 ## Mapa mental do projeto
