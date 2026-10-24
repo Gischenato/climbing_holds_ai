@@ -16,10 +16,11 @@ class Detector(ABC):
 
 
 class SamDetector(Detector):
-    def __init__(self, max_side: int = 1024) -> None:
+    def __init__(self, max_side: int = 1536) -> None:
         self._generator = build_generator()  # carrega o modelo na GPU (lento: fazer uma vez)
         # O SAM roda internamente em 1024 px, mas devolve cada máscara na resolução da entrada:
         # numa foto de celular (4000x1848) isso leva ~9 min e enche a VRAM. Reduzimos antes.
+        # 1536 acha mais agarras pequenas que 1024; acima disso quase não muda (docs/resultados-sam-resolucao.md).
         self.max_side = max_side
 
     def detect(self, image_rgb: np.ndarray) -> list[Hold]:

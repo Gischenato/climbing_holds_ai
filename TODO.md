@@ -85,6 +85,10 @@
   - **Falsos positivos**: quase todos **fora da parede** (teto, ventiladores, colchão, batente, a pessoa escalando). Ideia: detectar a região da parede e descartar o resto
   - **Agarras não achadas**: principalmente **agarras sobre volumes** (o SAM pega o volume e perde a agarra) e agarras **pequenas** em fotos panorâmicas (poucos pixels depois da redução para 1024 px)
   - Quando acha, o contorno é bom (IoU médio 0,90)
+- [x] Testar resoluções maiores (`python -m backend.evaluate --max-side N`) — 📖 [resultados](docs/resultados-sam-resolucao.md)
+  - 1536 px: recall 0,81 → 0,87 (agarras pequenas 57% → 69%), precision 0,73 → 0,63, ~10 s/foto. Acima de 1536 quase não muda
+- [x] Decidir o `max_side` padrão do `SamDetector` → **1536 px**
+- [ ] Filtro para descartar máscaras fora da parede (maior fonte de falso positivo)
 - [ ] Anotar as outras 15 fotos e rodar de novo
 
 ## Fase 4.1 — Preparar o dataset de treino (juntar datasets + caixas → polígonos)
@@ -117,6 +121,8 @@
 - [ ] Analisar as curvas de treino (loss, mAP) e checar overfitting
 - [ ] Avaliar no **mesmo** conjunto de teste da Fase 4 e comparar com o SAM
   - Olhar o mAP **por classe** (`hold` e `volume` separados)
+- [ ] Repetir o teste de resolução com o YOLO: inferência com `imgsz` 640 / 960 / 1280 (e treino no mesmo tamanho), olhando o recall das agarras **pequenas** — comparar com a tabela do SAM em 📖 [resultados](docs/resultados-sam-resolucao.md)
+  - O `evaluate.py` já mede tudo isso; só falta o `--max-side` virar um parâmetro genérico do detector
 - [ ] Se volumes ficarem ruins: primeiro buscar **mais exemplos** de volume (outros datasets, fotos próprias de paredes com muitos módulos)
 - [ ] Implementar `YoloDetector` e permitir escolher o detector (config ou parâmetro da API)
   - Adicionar `kind: "hold" | "volume"` ao `Hold` e à resposta do `/detect`; o frontend desenha volumes com outra cor (atualizar `docs/api.md`)

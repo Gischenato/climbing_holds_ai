@@ -115,10 +115,10 @@ upload ──▶ read_image ──▶ detector.detect ──▶ JSON
 ```
 
 1. `read_image` ([main.py](../backend/main.py)) abre a imagem, aplica a orientação EXIF, converte para RGB e reduz se passar de 2048 px.
-2. `SamDetector.detect` ([detectors.py](../backend/detectors.py)) reduz a imagem para no máximo 1024 px (o SAM devolve cada máscara na resolução da entrada; em resolução cheia uma foto levava ~9 min), gera as máscaras com o SAM 2.1, filtra o que não parece agarra ([holds.py](../backend/holds.py)): área mínima (0,01% da imagem) e máxima (5%), formato muito alongado, máscaras grandes tocando a borda e duplicatas (IoU > 0,5).
+2. `SamDetector.detect` ([detectors.py](../backend/detectors.py)) reduz a imagem para no máximo 1536 px (o SAM devolve cada máscara na resolução da entrada: em resolução cheia uma foto levava ~9 min; 1536 px foi o melhor equilíbrio, ver [resultados](resultados-sam-resolucao.md)), gera as máscaras com o SAM 2.1, filtra o que não parece agarra ([holds.py](../backend/holds.py)): área mínima (0,01% da imagem) e máxima (5%), formato muito alongado, máscaras grandes tocando a borda e duplicatas (IoU > 0,5).
 3. Cada máscara restante vira um polígono (`cv2.findContours` + `approxPolyDP`), escalado de volta para as coordenadas da imagem recebida.
 
-Os parâmetros do SAM e dos filtros foram escolhidos medindo contra o dataset: recall ≈ 80%, precision ≈ 66%. Ou seja, algumas agarras podem faltar e algumas marcações não são agarras (painéis, discos no chão). Nas fotos próprias da Fase 4 (`python -m backend.evaluate`): recall ≈ 81%, precision ≈ 73%, ~6–8 s por foto numa RTX 4070 SUPER.
+Os parâmetros do SAM e dos filtros foram escolhidos medindo contra o dataset: recall ≈ 80%, precision ≈ 66%. Ou seja, algumas agarras podem faltar e algumas marcações não são agarras (painéis, discos no chão). Nas fotos próprias da Fase 4 (`python -m backend.evaluate`): recall ≈ 87%, precision ≈ 63%, ~10 s por foto numa RTX 4070 SUPER.
 
 O `backend/__init__.py` ativa `PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True`: sem isso o cache de memória do PyTorch fragmenta entre requisições e, no WSL2, transborda para a RAM, deixando a detecção até 20× mais lenta. Detalhes no [TODO](../TODO.md).
 

@@ -5,7 +5,7 @@ Critério de casamento:
 - Casou com `hold` → TP. Casou com `tape`/`volume` → ignorada (nem acerto nem erro, só contada).
 - Não casou com nada → FP. Agarra anotada que sobrou → FN.
 
-Uso: python -m backend.evaluate [--data data/test] [--iou 0.5] [--out data/out/eval]
+Uso: python -m backend.evaluate [--data data/test] [--iou 0.5] [--max-side 1536] [--out data/out/eval]
 """
 import argparse
 import time
@@ -145,9 +145,10 @@ def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--data", default="data/test")
     parser.add_argument("--iou", type=float, default=0.5)
+    parser.add_argument("--max-side", type=int, default=1536, help="lado máximo da imagem passada ao SAM")
     parser.add_argument("--out", default="data/out/eval", help="'' para não salvar imagens")
     args = parser.parse_args()
-    evaluate(SamDetector(), Path(args.data), args.iou, Path(args.out) if args.out else None)
+    evaluate(SamDetector(max_side=args.max_side), Path(args.data), args.iou, Path(args.out) if args.out else None)
 
 
 if __name__ == "__main__":
