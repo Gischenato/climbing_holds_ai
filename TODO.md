@@ -78,7 +78,9 @@
 - [x] Script de avaliação: precision, recall e IoU médio — `python -m backend.evaluate` (fitas e volumes do gabarito são ignorados, não contam como erro)
   - Resultado (6 fotos, IoU ≥ 0,5): **precision 0,73 · recall 0,81 · F1 0,77 · IoU médio 0,90**
   - Em resolução cheia o SAM levava ~9 min por foto (devolve cada máscara no tamanho da entrada): o `SamDetector` agora reduz para 1024 px e escala os polígonos de volta
-  - [ ] Investigar a variação de tempo entre fotos (11 s a 278 s com o mesmo tamanho)
+  - [x] Investigar a variação de tempo entre fotos (11 s a 278 s com o mesmo tamanho)
+    - Causa: fragmentação do cache de memória do PyTorch (13 GB reservados para ~3 GB em uso, numa placa de 12 GB). No WSL2 a VRAM transborda para a RAM em vez de dar erro, e tudo fica lento a partir da 2ª foto
+    - Correção: `PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True` em `backend/__init__.py` → reserva estável em ~3,3 GB e **6–8 s por foto**
 - [x] Anotar os principais erros (6 fotos):
   - **Falsos positivos**: quase todos **fora da parede** (teto, ventiladores, colchão, batente, a pessoa escalando). Ideia: detectar a região da parede e descartar o resto
   - **Agarras não achadas**: principalmente **agarras sobre volumes** (o SAM pega o volume e perde a agarra) e agarras **pequenas** em fotos panorâmicas (poucos pixels depois da redução para 1024 px)
