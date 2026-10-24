@@ -13,8 +13,8 @@ import torch
 from backend.holds import filter_masks
 from backend.try_sam import build_generator
 
-IMAGES = Path("data/train/images")
-LABELS = Path("data/train/labels")
+IMAGES = Path("data/raw/roboflow-climbing-holds-v1/train/images")
+LABELS = Path("data/raw/roboflow-climbing-holds-v1/train/labels")
 VOLUME_CLASS = 9
 
 

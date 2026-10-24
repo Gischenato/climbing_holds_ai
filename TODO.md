@@ -19,7 +19,7 @@
   backend/    # API FastAPI + detectores
   frontend/   # index.html, app.js, style.css
   models/     # checkpoints baixados/treinados (fora do git)
-  data/       # imagens de teste e datasets (fora do git)
+  data/       # imagens de teste e datasets (fora do git) — 📖 [organização](docs/05-datasets-e-anotacao.md#no-nosso-projeto)
   ```
 - [x] `git init` + `.gitignore` (ignorar `.venv/`, `models/`, `data/`)
 - [x] `requirements.txt` inicial
@@ -29,7 +29,7 @@
 - [ ] Estudar: 📖 [Visão computacional](docs/01-visao-computacional.md) e 📖 [Segment Anything](docs/03-segment-anything-sam.md)
 - [x] Escolher a versão do SAM (**SAM 2.1 escolhido**: o SAM 3, que aceita prompt de texto como `"climbing hold"`, tem checkpoint restrito no HuggingFace — exige solicitar acesso; fica como opção futura)
 - [x] Baixar o checkpoint para `models/`
-- [x] Separar algumas fotos para testar (não precisa de anotação): imagens de `data/train/images/` servem para começar, mas fotos próprias em resolução cheia são melhores (as do dataset têm só 640 px)
+- [x] Separar algumas fotos para testar (não precisa de anotação): imagens de `data/raw/roboflow-climbing-holds-v1/train/images/` servem para começar, mas fotos próprias em resolução cheia são melhores (as do dataset têm só 640 px)
 - [x] Script `backend/try_sam.py`: carregar uma foto de parede e gerar todas as máscaras automaticamente
 - [x] Salvar uma imagem com as máscaras sobrepostas para inspecionar o resultado
 - [x] Ajustar parâmetros do gerador (`points_per_side`, `pred_iou_thresh`, `stability_score_thresh`) — 📖 [parâmetros](docs/03-segment-anything-sam.md#parâmetros-do-automatic-mask-generator)
@@ -71,17 +71,28 @@
 
 - [ ] Estudar: 📖 [Métricas](docs/06-metricas.md)
 - [ ] Juntar ~20 fotos **próprias** de paredes variadas (ângulos, iluminação, cores) em `data/test/` — nenhuma pode estar nos datasets de treino
-- [ ] Anotar manualmente as agarras de algumas fotos — 📖 [Anotação](docs/05-datasets-e-anotacao.md)
-- [ ] Script de avaliação: precision, recall e IoU médio
-- [ ] Anotar os principais erros (parafusos? volumes? sombras? agarras pequenas?)
+- [ ] Anotar manualmente as agarras das fotos (começar por ~5 para validar o critério e o script, depois o resto) — 📖 [Anotação](docs/05-datasets-e-anotacao.md)
+  - Anotar também os **volumes (módulos)**, como classe separada: o SAM não distingue, mas o gabarito será usado para avaliar o YOLO na Fase 5
+  - Classes do gabarito: `hold` (0), `tape` (1, fitas que marcam as vias), `volume` (2). Exportado do Roboflow em YOLOv11 sem resize
+  - Progresso: 21 fotos tiradas, 6 anotadas em `data/test/` (326 agarras, 31 volumes, 113 fitas)
+- [x] Script de avaliação: precision, recall e IoU médio — `python -m backend.evaluate` (fitas e volumes do gabarito são ignorados, não contam como erro)
+  - Resultado (6 fotos, IoU ≥ 0,5): **precision 0,73 · recall 0,81 · F1 0,77 · IoU médio 0,90**
+  - Em resolução cheia o SAM levava ~9 min por foto (devolve cada máscara no tamanho da entrada): o `SamDetector` agora reduz para 1024 px e escala os polígonos de volta
+  - [ ] Investigar a variação de tempo entre fotos (11 s a 278 s com o mesmo tamanho)
+- [x] Anotar os principais erros (6 fotos):
+  - **Falsos positivos**: quase todos **fora da parede** (teto, ventiladores, colchão, batente, a pessoa escalando). Ideia: detectar a região da parede e descartar o resto
+  - **Agarras não achadas**: principalmente **agarras sobre volumes** (o SAM pega o volume e perde a agarra) e agarras **pequenas** em fotos panorâmicas (poucos pixels depois da redução para 1024 px)
+  - Quando acha, o contorno é bom (IoU médio 0,90)
+- [ ] Anotar as outras 15 fotos e rodar de novo
 
 ## Fase 4.1 — Preparar o dataset de treino (juntar datasets + caixas → polígonos)
 
 > Os datasets públicos vêm em formatos diferentes: só **caixas** (linhas `classe x y w h`), só polígonos, ou misturados (o atual tem 8.756 caixas e 7.733 polígonos). Também vêm com classes diferentes (o atual tem 12: cores + `volume`). Treinar YOLO-seg com caixas ensina o modelo a prever retângulos.
 
-- [ ] Juntar os datasets originais em `data/` (sem modificar) e conferir a licença de cada um
+- [ ] Juntar os datasets originais em `data/raw/<nome>/` (um por pasta, sem modificar) e conferir a licença de cada um
 - [ ] Comparar o critério de anotação entre eles (volume conta? números de via? contorno justo?) — 📖 [regras de anotação](docs/05-datasets-e-anotacao.md#anotação)
-- [ ] Definir as classes finais: `hold` + `volume` (ou só `hold`); as cores ficam no original para o backlog
+- [ ] Classes finais: **`hold` (0) + `volume` (1)**; as cores ficam no original para o backlog
+  - O dataset atual tem só 89 volumes contra ~16.400 agarras. Manter a classe mesmo assim: é fácil filtrar depois (gerar um dataset só de agarras ou só de volumes), e o contrário exige reanotar
 - [ ] Script `backend/prepare_dataset.py` (lê um ou mais datasets → gera `data/holds/`):
   - [ ] Remapear as classes de cada dataset para as classes finais (descartar o que não é agarra)
   - [ ] Linhas com **caixa**: converter para pixels e passar como **prompt de caixa** para o SAM — 📖 [tipos de prompt](docs/03-segment-anything-sam.md#tipos-de-prompt)
@@ -103,13 +114,18 @@
 - [ ] Fine-tuning do `yolo11n-seg.pt` (começar pequeno, depois testar `s`/`m`)
 - [ ] Analisar as curvas de treino (loss, mAP) e checar overfitting
 - [ ] Avaliar no **mesmo** conjunto de teste da Fase 4 e comparar com o SAM
+  - Olhar o mAP **por classe** (`hold` e `volume` separados)
+- [ ] Se volumes ficarem ruins: primeiro buscar **mais exemplos** de volume (outros datasets, fotos próprias de paredes com muitos módulos)
 - [ ] Implementar `YoloDetector` e permitir escolher o detector (config ou parâmetro da API)
+  - Adicionar `kind: "hold" | "volume"` ao `Hold` e à resposta do `/detect`; o frontend desenha volumes com outra cor (atualizar `docs/api.md`)
+- [ ] Opcional: dois modelos separados (um de agarras, outro de volumes) combinados por um `CombinedDetector` **no backend**, devolvendo uma lista só. Vale a pena se quiser iterar no de volumes sem retreinar o de agarras, ou rodar volumes numa resolução menor
 - [ ] ⚠️ Ultralytics é licença **AGPL-3.0** — ok para estudo; ver implicações se o projeto virar produto
 
 ## Backlog (futuro)
 
 - [ ] Classificar o tipo de agarra (jug, crimp, sloper, pinch, pocket, volume…)
 - [ ] Agrupar agarras por cor (para identificar vias/boulders)
+- [ ] Usar as **fitas** (`tape`, já anotadas no gabarito da Fase 4) para achar as agarras de cada via
 - [ ] Salvar boulders (conjunto de agarras selecionadas + nome + grau)
 - [ ] Marcar agarras de início / fim / só pé
 - [ ] Exportar imagem com a seleção destacada

@@ -1,7 +1,7 @@
 """Experimento da Fase 1: gera máscaras automáticas do SAM 2 e salva uma imagem de debug.
 
 Uso:
-    python -m backend.try_sam data/train/images/foto.jpg [--out data/out]
+    python -m backend.try_sam data/raw/roboflow-climbing-holds-v1/train/images/foto.jpg [--out data/out]
 """
 import argparse
 from pathlib import Path

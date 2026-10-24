@@ -81,6 +81,18 @@ Para agarras, cuidado com **mudanças de cor (hue)** muito fortes se no futuro q
 - **Fase 5**: usamos um dataset público (busque "climbing holds" no [Roboflow Universe](https://universe.roboflow.com/)), conferindo licença, quantidade de imagens e se as anotações são **polígonos** (não só caixas).
 - **Futuro**: as correções manuais feitas no app (adicionar/remover agarra) podem virar novas anotações — um ciclo de melhoria contínua.
 
+Organização da pasta `data/` (fora do git):
+
+```
+data/
+  raw/                           # datasets públicos originais, sem modificar
+    roboflow-climbing-holds-v1/  # um por pasta: <origem>-<nome>-v<versão>
+  test/                          # fotos próprias anotadas (Fase 4), nunca usadas no treino
+    images/  labels/  data.yaml  # export YOLOv11 do Roboflow, sem resize
+  holds/                         # dataset final gerado pelo prepare_dataset.py (Fase 4.1)
+  out/                           # imagens de debug dos scripts
+```
+
 ## Para ir além
 
 - [Ultralytics — formato de dataset de segmentação](https://docs.ultralytics.com/datasets/segment/)

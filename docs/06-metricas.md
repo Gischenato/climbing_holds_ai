@@ -97,6 +97,13 @@ def iou(a, b):  # a, b: máscaras booleanas numpy (H, W)
     return inter / union if union else 0.0
 ```
 
+O script real é o [backend/evaluate.py](../backend/evaluate.py) (`python -m backend.evaluate`). Diferenças em relação ao esboço acima:
+
+- Avalia qualquer `Detector`, então serve igual para o SAM e o YOLO.
+- O gabarito tem as classes `hold`, `tape` (fitas das vias) e `volume`. Uma previsão que casa com fita ou volume é **ignorada**: não conta como acerto nem como erro, só é contada à parte. O recall considera só as `hold`.
+- As máscaras são recortadas no bbox de cada polígono; máscaras inteiras em 4000×1848 não caberiam na memória.
+- Salva em `data/out/eval/` cada foto com verde = acerto, vermelho = agarra não achada, amarelo = falso positivo, azul = ignorada.
+
 **Fase 5** — comparar SAM vs. YOLO no **mesmo** conjunto de teste, com o mesmo script.
 
 ## Para ir além
