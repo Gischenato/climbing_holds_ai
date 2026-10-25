@@ -73,10 +73,11 @@
 - [ ] Juntar ~20 fotos **próprias** de paredes variadas (ângulos, iluminação, cores) em `data/test/` — nenhuma pode estar nos datasets de treino
 - [ ] Anotar manualmente as agarras das fotos (começar por ~5 para validar o critério e o script, depois o resto) — 📖 [Anotação](docs/05-datasets-e-anotacao.md)
   - Anotar também os **volumes (módulos)**, como classe separada: o SAM não distingue, mas o gabarito será usado para avaliar o YOLO na Fase 5
-  - Classes do gabarito: `hold` (0), `tape` (1, fitas que marcam as vias), `volume` (2). Exportado do Roboflow em YOLOv11 sem resize
-  - Progresso: 21 fotos tiradas, 6 anotadas em `data/test/` (326 agarras, 31 volumes, 113 fitas)
+  - Classes do gabarito (v3): `hold` (0), `tape` (1, fitas que marcam as vias), `volume` (2). Exportado do Roboflow em YOLOv11 sem resize. Os índices mudam entre versões: o `evaluate.py` lê os nomes do `data.yaml`
+  - Progresso: 21 fotos tiradas, 11 anotadas em `data/test/` (v3: 666 agarras, 60 volumes, 244 fitas)
 - [x] Script de avaliação: precision, recall e IoU médio — `python -m backend.evaluate` (fitas e volumes do gabarito são ignorados, não contam como erro)
-  - Resultado (6 fotos, IoU ≥ 0,5): **precision 0,73 · recall 0,81 · F1 0,77 · IoU médio 0,90**
+  - Resultado (6 fotos, 1024 px, IoU ≥ 0,5): precision 0,73 · recall 0,81 · F1 0,77 · IoU médio 0,90
+  - Resultado (11 fotos, 1536 px): **precision 0,67 · recall 0,86 · F1 0,75 · IoU médio 0,90**
   - Em resolução cheia o SAM levava ~9 min por foto (devolve cada máscara no tamanho da entrada): o `SamDetector` agora reduz para 1024 px e escala os polígonos de volta
   - [x] Investigar a variação de tempo entre fotos (11 s a 278 s com o mesmo tamanho)
     - Causa: fragmentação do cache de memória do PyTorch (13 GB reservados para ~3 GB em uso, numa placa de 12 GB). No WSL2 a VRAM transborda para a RAM em vez de dar erro, e tudo fica lento a partir da 2ª foto
@@ -86,10 +87,10 @@
   - **Agarras não achadas**: principalmente **agarras sobre volumes** (o SAM pega o volume e perde a agarra) e agarras **pequenas** em fotos panorâmicas (poucos pixels depois da redução para 1024 px)
   - Quando acha, o contorno é bom (IoU médio 0,90)
 - [x] Testar resoluções maiores (`python -m backend.evaluate --max-side N`) — 📖 [resultados](docs/resultados-sam-resolucao.md)
-  - 1536 px: recall 0,81 → 0,87 (agarras pequenas 57% → 69%), precision 0,73 → 0,63, ~10 s/foto. Acima de 1536 quase não muda
+  - 1536 px: recall 0,81 → 0,87 (agarras pequenas 57% → 69%), precision 0,73 → 0,63, ~10 s/foto. Acima de 1536 quase não muda. Confirmado nas 5 fotos novas da v2: recall 0,78 → 0,86, precision 0,79 → 0,71
 - [x] Decidir o `max_side` padrão do `SamDetector` → **1536 px**
 - [ ] Filtro para descartar máscaras fora da parede (maior fonte de falso positivo)
-- [ ] Anotar as outras 15 fotos e rodar de novo
+- [ ] Anotar as outras 10 fotos e rodar de novo
 
 ## Fase 4.1 — Preparar o dataset de treino (juntar datasets + caixas → polígonos)
 

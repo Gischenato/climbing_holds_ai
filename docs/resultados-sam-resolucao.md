@@ -98,9 +98,20 @@ A queda da precision provavelmente dá para recuperar com filtros:
 
 Os crops ficam como opção se o tempo deixar de importar (por exemplo, processar a foto uma vez e guardar o resultado).
 
+## Validação com fotos novas
+
+Depois da decisão, a v2 do gabarito trouxe **5 fotos novas** (340 agarras) que não foram usadas para escolher a resolução. Elas servem para checar se a conclusão não foi "decorada" nas 6 primeiras:
+
+| Só as 5 fotos novas | Precision | Recall | TP | FP | FN |
+|---|---|---|---|---|---|
+| 1024 | 0,79 | 0,78 | 266 | 69 | 74 |
+| 1536 | 0,71 | 0,86 | 291 | 120 | 49 |
+
+O padrão se repete: com 1536 px o recall sobe (+7 pontos) e a precision cai (−9 pontos). A decisão se mantém. Nas 11 fotos juntas, 1536 px dá **precision 0,67 · recall 0,86 · F1 0,75**.
+
 ## Limitações
 
-- **Só 6 fotos**, todas da mesma academia e do mesmo dia. Os números vão mudar com as outras 15.
+- **Poucas fotos** (6 na tabela principal, 11 na validação), todas da mesma academia e do mesmo dia.
 - Os parâmetros do SAM e dos filtros foram ajustados na Fase 1 com o dataset do Roboflow em **640 px**. Com 1536 px, talvez valha reajustá-los ([`backend/tune_filters.py`](../backend/tune_filters.py)).
 - O tempo é numa RTX 4070 SUPER no WSL2. O máximo varia mais que a média porque a foto panorâmica gera mais máscaras.
 
